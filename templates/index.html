@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Meal Plan Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__content">
+          <p class="eyebrow">Meal Plan Viewer & Tracker</p>
+          <h1>Stay on top of today’s meals from anywhere.</h1>
+          <p class="hero__text">
+            Browse your plan by date, tick meals off as you go, and keep your
+            Google Sheet in sync through the Apps Script API.
+          </p>
+        </div>
+        <div class="hero__stats" id="summaryCard">
+          <div>
+            <span class="stat-label">Planned</span>
+            <strong id="totalMeals">0</strong>
+          </div>
+          <div>
+            <span class="stat-label">Completed</span>
+            <strong id="completedMeals">0</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="app-panel">
+        <section class="toolbar">
+          <div class="toolbar__group toolbar__group--date">
+            <button class="ghost-button" id="previousDayBtn" type="button">
+              Previous Day
+            </button>
+            <button class="primary-button" id="todayBtn" type="button">
+              Today
+            </button>
+            <button class="ghost-button" id="nextDayBtn" type="button">
+              Next Day
+            </button>
+          </div>
+
+          <div class="toolbar__group toolbar__group--picker">
+            <label for="datePicker">Select date</label>
+            <input id="datePicker" type="date" />
+          </div>
+        </section>
+
+        <section class="status-row">
+          <div>
+            <p class="status-row__label">Viewing</p>
+            <h2 id="selectedDateLabel">Today</h2>
+          </div>
+          <p id="feedbackMessage" class="feedback" aria-live="polite"></p>
+        </section>
+
+        <section id="mealGrid" class="meal-grid" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <template id="mealCardTemplate">
+      <article class="meal-card">
+        <div class="meal-card__header">
+          <div>
+            <span class="meal-card__badge"></span>
+            <h3 class="meal-card__title"></h3>
+          </div>
+          <label class="meal-toggle">
+            <input type="checkbox" />
+            <span>Completed</span>
+          </label>
+        </div>
+        <p class="meal-card__description"></p>
+        <dl class="meal-card__meta"></dl>
+      </article>
+    </template>
+
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </body>
+</html>
