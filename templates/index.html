@@ -3,29 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daily Meal Plan Viewer</title>
+    <title>Meal & Grocery Tracker</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
   </head>
+
   <body>
     <div class="page-shell">
+
+      <!-- ================= HEADER ================= -->
       <header class="hero">
         <div class="hero__content">
-          <p class="eyebrow">Meal Plan Viewer & Tracker</p>
-          <h1>Stay on top of today’s meals from anywhere.</h1>
+          <p class="eyebrow">Meal & Grocery Tracker</p>
+          <h1>Stay organised with meals and shopping in one place.</h1>
           <p class="hero__text">
-            Browse your plan by date, tick meals off as you go, and keep your
-            Google Sheet in sync through the Apps Script API.
+            Track your daily meals, manage your grocery list, and keep everything
+            synced with your Google Sheet.
           </p>
         </div>
+
         <div class="hero__stats" id="summaryCard">
           <div>
             <span class="stat-label">Planned</span>
@@ -38,38 +44,76 @@
         </div>
       </header>
 
+      <!-- ================= TABS ================= -->
+      <div class="tabs">
+        <button class="tab active" data-tab="meals">🍽 Meals</button>
+        <button class="tab" data-tab="groceries">🛒 Groceries</button>
+      </div>
+
+      <!-- ================= MAIN ================= -->
       <main class="app-panel">
-        <section class="toolbar">
-          <div class="toolbar__group toolbar__group--date">
-            <button class="ghost-button" id="previousDayBtn" type="button">
-              Previous Day
-            </button>
-            <button class="primary-button" id="todayBtn" type="button">
-              Today
-            </button>
-            <button class="ghost-button" id="nextDayBtn" type="button">
-              Next Day
-            </button>
+
+        <!-- ================= MEALS VIEW ================= -->
+        <section id="mealsView">
+
+          <section class="toolbar">
+            <div class="toolbar__group toolbar__group--date">
+              <button class="ghost-button" id="previousDayBtn">Previous</button>
+              <button class="primary-button" id="todayBtn">Today</button>
+              <button class="ghost-button" id="nextDayBtn">Next</button>
+            </div>
+
+            <div class="toolbar__group toolbar__group--picker">
+              <label for="datePicker">Select date</label>
+              <input id="datePicker" type="date" />
+            </div>
+          </section>
+
+          <section class="status-row">
+            <div>
+              <p class="status-row__label">Viewing</p>
+              <h2 id="selectedDateLabel">Today</h2>
+            </div>
+            <p id="feedbackMessage" class="feedback"></p>
+          </section>
+
+          <section id="mealGrid" class="meal-grid"></section>
+        </section>
+
+        <!-- ================= GROCERIES VIEW ================= -->
+        <section id="groceriesView" style="display:none;">
+
+          <div class="groceries-header">
+            <h2>Monthly Groceries</h2>
+            <button class="primary-button" id="addItemBtn">+ Add Item</button>
           </div>
 
-          <div class="toolbar__group toolbar__group--picker">
-            <label for="datePicker">Select date</label>
-            <input id="datePicker" type="date" />
+          <div class="groceries-summary">
+            <span>Total Cost:</span>
+            <strong id="totalCost">£0.00</strong>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="groceries-table">
+              <thead>
+                <tr>
+                  <th>Buy</th>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Qty</th>
+                  <th>Price (£)</th>
+                  <th>Total (£)</th>
+                </tr>
+              </thead>
+              <tbody id="groceriesTableBody"></tbody>
+            </table>
           </div>
         </section>
 
-        <section class="status-row">
-          <div>
-            <p class="status-row__label">Viewing</p>
-            <h2 id="selectedDateLabel">Today</h2>
-          </div>
-          <p id="feedbackMessage" class="feedback" aria-live="polite"></p>
-        </section>
-
-        <section id="mealGrid" class="meal-grid" aria-live="polite"></section>
       </main>
     </div>
 
+    <!-- ================= MEAL TEMPLATE ================= -->
     <template id="mealCardTemplate">
       <article class="meal-card">
         <div class="meal-card__header">
@@ -82,11 +126,37 @@
             <span>Completed</span>
           </label>
         </div>
+
         <p class="meal-card__description"></p>
         <dl class="meal-card__meta"></dl>
       </article>
     </template>
 
+    <!-- ================= JS ================= -->
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+
+    <!-- ================= TAB SCRIPT ================= -->
+    <script>
+      const tabs = document.querySelectorAll(".tab");
+      const mealsView = document.getElementById("mealsView");
+      const groceriesView = document.getElementById("groceriesView");
+
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          tabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+
+          if (tab.dataset.tab === "meals") {
+            mealsView.style.display = "block";
+            groceriesView.style.display = "none";
+          } else {
+            mealsView.style.display = "none";
+            groceriesView.style.display = "block";
+            if (window.loadGroceries) loadGroceries();
+          }
+        });
+      });
+    </script>
+
   </body>
 </html>
