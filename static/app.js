@@ -233,3 +233,51 @@ async function loadGroceries() {
     console.error("Error loading groceries:", err);
   }
 }
+async function updateGrocery(id, toBuy, quantity, price) {
+  try {
+    await fetch("/api/groceries/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: id,
+        toBuy: toBuy ? "yes" : "no",
+        quantity: Number(quantity),
+        price: Number(price)
+      })
+    });
+
+    loadGroceries(); // refresh table
+  } catch (err) {
+    console.error("Update failed:", err);
+  }
+}
+document.getElementById("addItemBtn")?.addEventListener("click", async () => {
+  const name = prompt("Item name:");
+  if (!name) return;
+
+  const category = prompt("Category (optional):") || "";
+  const quantity = Number(prompt("Quantity:", "1"));
+  const price = Number(prompt("Price per unit:", "0"));
+
+  try {
+    await fetch("/api/groceries/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        category,
+        quantity,
+        price,
+        toBuy: "yes"
+      })
+    });
+
+    loadGroceries();
+  } catch (err) {
+    console.error("Add failed:", err);
+  }
+});
