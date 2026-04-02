@@ -187,3 +187,49 @@ async function toggleMealStatus(meal, checkbox, card) {
 
 syncDateControls();
 loadMeals();
+
+async function loadGroceries() {
+  try {
+    const res = await fetch("/api/groceries");
+    const data = await res.json();
+
+    const tbody = document.getElementById("groceriesTableBody");
+    const totalEl = document.getElementById("totalCost");
+
+    tbody.innerHTML = "";
+
+    let totalCost = 0;
+
+    data.groceries.forEach(item => {
+      const row = document.createElement("tr");
+
+      const itemTotal = Number(item.total) || (item.quantity * item.price);
+      totalCost += itemTotal;
+
+      row.innerHTML = `
+        <td>
+          <input type="checkbox" ${item.toBuy === "yes" ? "checked" : ""} 
+            onchange="updateGrocery(${item.id}, this.checked, ${item.quantity}, ${item.price})">
+        </td>
+        <td>${item.name}</td>
+        <td>${item.category || ""}</td>
+        <td>
+          <input type="number" value="${item.quantity}" min="1"
+            onchange="updateGrocery(${item.id}, ${item.toBuy === "yes"}, this.value, ${item.price})">
+        </td>
+        <td>
+          <input type="number" value="${item.price}" step="0.01"
+            onchange="updateGrocery(${item.id}, ${item.toBuy === "yes"}, ${item.quantity}, this.value)">
+        </td>
+        <td>£${itemTotal.toFixed(2)}</td>
+      `;
+
+      tbody.appendChild(row);
+    });
+
+    totalEl.textContent = `£${totalCost.toFixed(2)}`;
+
+  } catch (err) {
+    console.error("Error loading groceries:", err);
+  }
+}
